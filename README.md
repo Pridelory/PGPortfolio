@@ -47,3 +47,4 @@ There is always risk of loss in trading. **All trading strategies are used at yo
 
 * The project has been open-sourced for many years (since 2017). The market efficiency may have increased quite a lot since then. There is no guarantee the exact same algorithm can still work.
 * Although we tried to make assumptions closer to the situation in the real market, the results are all from backtest on static historical data. The slippage or market impact can always be a problem if you deploy it as a live trading bot.
+
