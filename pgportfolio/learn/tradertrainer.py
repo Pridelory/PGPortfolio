@@ -10,7 +10,7 @@ import collections
 import tflearn
 import numpy as np
 import pandas as pd
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 from pgportfolio.learn.nnagent import NNAgent
 from pgportfolio.marketdata.datamatrices import DataMatrices
 import logging
