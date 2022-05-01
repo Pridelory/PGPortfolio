@@ -70,9 +70,13 @@ class BackTest(trader.Trader):
     def trade_by_strategy(self, omega):
         logging.info("the step is {}".format(self._steps))
         logging.debug("the raw omega is {}".format(omega))
+        # relative price vector
         future_price = np.concatenate((np.ones(1), self.__get_matrix_y()))
+        # μ
         pv_after_commission = calculate_pv_after_commission(omega, self._last_omega, self._commission_rate)
+        # μ * y * w
         portfolio_change = pv_after_commission * np.dot(omega, future_price)
+        # p(t) = p(t-1) * portfolio_change
         self._total_capital *= portfolio_change
         self._last_omega = pv_after_commission * omega * \
                            future_price /\

@@ -3,10 +3,11 @@
 from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
-import tensorflow.compat.v1 as tf
+import tensorflow as tf
+# import tensorflow.compat.v1 as tf
 import tflearn
 
-tf.disable_v2_behavior()
+# tf.disable_v2_behavior()
 
 
 class NeuralNetWork:
@@ -123,7 +124,6 @@ class CNN(NeuralNetWork):
                 self.add_layer_to_dict('voting', network, weights=False)
                 network = tflearn.layers.core.activation(network, activation="softmax")
                 self.add_layer_to_dict('softmax_layer', network, weights=False)
-
             elif layer["type"] == "EIIE_LSTM" or\
                             layer["type"] == "EIIE_RNN":
                 network = tf.transpose(network, [0, 2, 3, 1])

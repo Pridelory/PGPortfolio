@@ -1,11 +1,13 @@
 from __future__ import absolute_import, print_function, division
 import tflearn
-import tensorflow.compat.v1 as tf
+import tensorflow as tf
+# import tensorflow.compat.v1 as tf
 import numpy as np
 from pgportfolio.constants import *
 import pgportfolio.learn.network as network
 
-tf.disable_v2_behavior()
+# tf.disable_v2_behavior()
+
 
 class NNAgent:
     def __init__(self, config, restore_dir=None, device="cpu"):
@@ -21,13 +23,15 @@ class NNAgent:
         self.__y = tf.placeholder(tf.float32, shape=[None,
                                                      self.__config["input"]["feature_number"],
                                                      self.__coin_number])
+
         self.__future_price = tf.concat([tf.ones([self.__net.input_num, 1]),
-                                       self.__y[:, 0, :]], 1)
-        self.__future_omega = (self.__future_price * self.__net.output) /\
+                                         self.__y[:, 0, :]], 1)
+        self.__future_omega = (self.__future_price * self.__net.output) / \
                               tf.reduce_sum(self.__future_price * self.__net.output, axis=1)[:, None]
         # tf.assert_equal(tf.reduce_sum(self.__future_omega, axis=1), tf.constant(1.0))
         self.__commission_ratio = self.__config["trading"]["trading_consumption"]
-        self.__pv_vector = tf.reduce_sum(self.__net.output * self.__future_price, reduction_indices=[1]) *\
+
+        self.__pv_vector = tf.reduce_sum(self.__net.output * self.__future_price, reduction_indices=[1]) * \
                            (tf.concat([tf.ones(1), self.__pure_pc()], axis=0))
         self.__log_mean_free = tf.reduce_mean(tf.log(tf.reduce_sum(self.__net.output * self.__future_price,
                                                                    reduction_indices=[1])))
@@ -97,7 +101,8 @@ class NNAgent:
                                                         reduction_indices=[1])))
 
         def loss_function5():
-            return -tf.reduce_mean(tf.log(tf.reduce_sum(self.__net.output * self.__future_price, reduction_indices=[1]))) + \
+            return -tf.reduce_mean(
+                tf.log(tf.reduce_sum(self.__net.output * self.__future_price, reduction_indices=[1]))) + \
                    LAMBDA * tf.reduce_mean(tf.reduce_sum(-tf.log(1 + 1e-6 - self.__net.output), reduction_indices=[1]))
 
         def loss_function6():
@@ -108,9 +113,10 @@ class NNAgent:
                    LAMBDA * tf.reduce_mean(tf.reduce_sum(-tf.log(1 + 1e-6 - self.__net.output), reduction_indices=[1]))
 
         def with_last_w():
-            return -tf.reduce_mean(tf.log(tf.reduce_sum(self.__net.output[:] * self.__future_price, reduction_indices=[1])
-                                          -tf.reduce_sum(tf.abs(self.__net.output[:, 1:] - self.__net.previous_w)
-                                                         *self.__commission_ratio, reduction_indices=[1])))
+            return -tf.reduce_mean(
+                tf.log(tf.reduce_sum(self.__net.output[:] * self.__future_price, reduction_indices=[1])
+                       - tf.reduce_sum(tf.abs(self.__net.output[:, 1:] - self.__net.previous_w)
+                                       * self.__commission_ratio, reduction_indices=[1])))
 
         loss_function = loss_function5
         if self.__config["training"]["loss_function"] == "loss_function4":
@@ -135,14 +141,14 @@ class NNAgent:
         learning_rate = tf.train.exponential_decay(learning_rate, self.__global_step,
                                                    decay_steps, decay_rate, staircase=True)
         if training_method == 'GradientDescent':
-            train_step = tf.train.GradientDescentOptimizer(learning_rate).\
-                         minimize(self.__loss, global_step=self.__global_step)
+            train_step = tf.train.GradientDescentOptimizer(learning_rate). \
+                minimize(self.__loss, global_step=self.__global_step)
         elif training_method == 'Adam':
-            train_step = tf.train.AdamOptimizer(learning_rate).\
-                         minimize(self.__loss, global_step=self.__global_step)
+            train_step = tf.train.AdamOptimizer(learning_rate). \
+                minimize(self.__loss, global_step=self.__global_step)
         elif training_method == 'RMSProp':
-            train_step = tf.train.RMSPropOptimizer(learning_rate).\
-                         minimize(self.__loss, global_step=self.__global_step)
+            train_step = tf.train.RMSPropOptimizer(learning_rate). \
+                minimize(self.__loss, global_step=self.__global_step)
         else:
             raise ValueError()
         return train_step
@@ -164,7 +170,7 @@ class NNAgent:
         tensors.append(self.__net.output)
         assert not np.any(np.isnan(x))
         assert not np.any(np.isnan(y))
-        assert not np.any(np.isnan(last_w)),\
+        assert not np.any(np.isnan(last_w)), \
             "the last_w is {}".format(last_w)
         results = self.__net.session.run(tensors,
                                          feed_dict={self.__net.input_tensor: x,
@@ -181,9 +187,9 @@ class NNAgent:
     # consumption vector (on each periods)
     def __pure_pc(self):
         c = self.__commission_ratio
-        w_t = self.__future_omega[:self.__net.input_num-1]  # rebalanced
+        w_t = self.__future_omega[:self.__net.input_num - 1]  # rebalanced
         w_t1 = self.__net.output[1:self.__net.input_num]
-        mu = 1 - tf.reduce_sum(tf.abs(w_t1[:, 1:]-w_t[:, 1:]), axis=1)*c
+        mu = 1 - tf.reduce_sum(tf.abs(w_t1[:, 1:] - w_t[:, 1:]), axis=1) * c
         """
         mu = 1-3*c+c**2
 
@@ -204,7 +210,7 @@ class NNAgent:
 
     # the history is a 3d matrix, return a asset vector
     def decide_by_history(self, history, last_w):
-        assert isinstance(history, np.ndarray),\
+        assert isinstance(history, np.ndarray), \
             "the history should be a numpy array, not %s" % type(history)
         assert not np.any(np.isnan(last_w))
         assert not np.any(np.isnan(history))

@@ -78,7 +78,7 @@ def plot_backtest(config, algos, labels=None):
             label = labels[i]
         else:
             label = NAMES[algos[i]]
-        ax.semilogy(dates, pvs, linewidth=1, label=label)
+        ax.semilogy(dates, pvs[:len(dates)], linewidth=1, label=label)
         #ax.plot(dates, pvs, linewidth=1, label=label)
 
     plt.ylabel("portfolio value $p_t/p_0$", fontsize=12)
@@ -163,6 +163,8 @@ def _load_from_summary(index, config):
     """
     dataframe = pd.DataFrame.from_csv("./train_package/train_summary.csv")
     history_string = dataframe.loc[int(index)]["backtest_test_history"]
+    dd = history_string.split(",")
+    print(len(dd))
     if not check_input_same(config, json.loads(dataframe.loc[int(index)]["config"])):
         raise ValueError("the date of this index is not the same as the default config")
     return np.fromstring(history_string, sep=",")[:-1]

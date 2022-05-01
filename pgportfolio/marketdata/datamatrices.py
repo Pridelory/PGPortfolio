@@ -40,7 +40,7 @@ class DataMatrices:
         type_list = get_type_list(feature_number)
         self.__features = type_list
         self.feature_number = feature_number
-        volume_forward = get_volume_forward(self.__end-start, test_portion, portion_reversed)
+        volume_forward = get_volume_forward(self.__end - start, test_portion, portion_reversed)
         self.__history_manager = gdm.HistoryManager(coin_number=coin_filter, end=self.__end,
                                                     volume_average_days=volume_average_days,
                                                     volume_forward=volume_forward, online=online)
@@ -124,7 +124,7 @@ class DataMatrices:
 
     @property
     def test_indices(self):
-        return self._test_ind[:-(self._window_size+1):]
+        return self._test_ind[:-(self._window_size + 1):]
 
     @property
     def num_test_samples(self):
@@ -136,7 +136,7 @@ class DataMatrices:
         Let it be None if in the backtest case.
         """
         self.__delta += 1
-        self._train_ind.append(self._train_ind[-1]+1)
+        self._train_ind.append(self._train_ind[-1] + 1)
         appended_index = self._train_ind[-1]
         self.__replay_buffer.append_experience(appended_index)
 
@@ -145,6 +145,12 @@ class DataMatrices:
 
     def get_training_set(self):
         return self.__pack_samples(self._train_ind[:-self._window_size])
+
+    def get_pure_training_data(self):
+        return self.__global_data.values[:, :, self._train_ind]
+
+    def get_pure_testing_data(self):
+        return self.__global_data.values[:, :, self._test_ind]
 
     def next_batch(self):
         """
@@ -158,19 +164,25 @@ class DataMatrices:
 
     def __pack_samples(self, indexs):
         indexs = np.array(indexs)
-        last_w = self.__PVM.values[indexs-1, :]
+        last_w = self.__PVM.values[indexs - 1, :]
 
         def setw(w):
             self.__PVM.iloc[indexs, :] = w
+
+        # remember that M is like a trading sliding window --> batch data
         M = [self.get_submatrix(index) for index in indexs]
         M = np.array(M)
+        # X represents the 3(closing, highest, lowest) relative price (to Bitcoin) of 11 currencies of previous 31 periods
         X = M[:, :, :, :-1]
+        # M[:, :, :, -1] represents the 3 (closing, highest, lowest) relative price (to Bitcoin) of 11 currencies of the new period
+        # M[:, 0, None, :, -2] represents the closing relative price (to Bitcoin) of 11 currencies of the last period of the previous periods
+        # y represents the price relative vector (reflecting the fluctuation of the prices) of the trading period t
         y = M[:, :, :, -1] / M[:, 0, None, :, -2]
         return {"X": X, "y": y, "last_w": last_w, "setw": setw}
 
     # volume in y is the volume in next access period
     def get_submatrix(self, ind):
-        return self.__global_data.values[:, :, ind:ind+self._window_size+1]
+        return self.__global_data.values[:, :, ind:ind + self._window_size + 1]
 
     def __divide_data(self, test_portion, portion_reversed):
         train_portion = 1 - test_portion

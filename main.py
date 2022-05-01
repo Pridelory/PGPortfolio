@@ -15,7 +15,7 @@ from pgportfolio.resultprocess import plot
 
 def build_parser():
     parser = ArgumentParser()
-    parser.add_argument("--mode",dest="mode",
+    parser.add_argument("--mode", dest="mode",
                         help="start mode, train, generate, download_data"
                              " backtest",
                         metavar="MODE", default="train")
@@ -90,7 +90,7 @@ def main():
         logging.basicConfig(level=logging.INFO)
         algos = options.algos.split(",")
         if options.labels:
-            labels = options.labels.replace("_"," ")
+            labels = options.labels.replace("_", " ")
             labels = labels.split(",")
         else:
             labels = algos
@@ -98,19 +98,20 @@ def main():
     elif options.mode == "table":
         algos = options.algos.split(",")
         if options.labels:
-            labels = options.labels.replace("_"," ")
+            labels = options.labels.replace("_", " ")
             labels = labels.split(",")
         else:
             labels = algos
         plot.table_backtest(load_config(), algos, labels, format=options.format)
 
+
 def _set_logging_by_algo(console_level, file_level, algo, name):
     if algo.isdigit():
-            logging.basicConfig(filename="./train_package/"+algo+"/"+name,
-                                level=file_level)
-            console = logging.StreamHandler()
-            console.setLevel(console_level)
-            logging.getLogger().addHandler(console)
+        logging.basicConfig(filename="./train_package/" + algo + "/" + name,
+                            level=file_level)
+        console = logging.StreamHandler()
+        console.setLevel(console_level)
+        logging.getLogger().addHandler(console)
     else:
         logging.basicConfig(level=console_level)
 
@@ -127,6 +128,7 @@ def _config_by_algo(algo):
     else:
         config = load_config()
     return config
+
 
 if __name__ == "__main__":
     main()
