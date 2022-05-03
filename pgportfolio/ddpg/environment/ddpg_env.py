@@ -58,7 +58,7 @@ class DataGenerator(object):
                    self.training_data[:, self.step + self.__window_size:self.step + self.__window_size + 1, :].copy()
         else:
             # self.step = np.random.randint(low=0, high=self.testing_data.shape[1] - self.__window_size - 1)
-            self.step = 30
+            self.step = 0
             return self.testing_data[:, self.step:self.step + self.__window_size, :].copy(), \
                    self.testing_data[:, self.step + self.__window_size:self.step + self.__window_size + 1, :].copy()
 
@@ -193,9 +193,9 @@ class PortfolioEnv(gym.Env):
 
     def _reset(self):
         self.infos = []
-        # self.sim.reset()
-        for sim in self.sim:
-            sim.reset()
+        self.sim.reset()
+        # for sim in self.sim:
+        #     sim.reset()
         observation, ground_truth_obs = self.src.reset()
         cash_observation = np.ones((1, self.src.get_window_length(), observation.shape[2]))
         observation = np.concatenate((cash_observation, observation), axis=0)

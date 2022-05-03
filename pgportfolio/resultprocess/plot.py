@@ -57,7 +57,7 @@ def plot_backtest(config, algos, labels=None):
             logging.info("finish executing "+algo)
 
     start, end = _extract_test(config)
-    timestamps = np.linspace(start, end, len(results[0]))
+    timestamps = np.linspace(start, end, 2775)
     dates = [datetime.datetime.fromtimestamp(int(ts)-int(ts)%config["input"]["global_period"])
              for ts in timestamps]
 
