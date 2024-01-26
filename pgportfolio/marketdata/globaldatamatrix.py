@@ -17,7 +17,7 @@ class HistoryManager:
     # NOTE: return of the sqlite results is a list of tuples, each tuple is a row
     def __init__(self, coin_number, end, volume_average_days=1, volume_forward=0, online=True):
         self.initialize_db()
-        self.__storage_period = FIVE_MINUTES  # keep this as 300
+        self.__storage_period = MINUTE_5  # keep this as 300
         self._coin_number = coin_number
         self._online = online
         if self._online:
@@ -137,7 +137,7 @@ class HistoryManager:
                 coins_tuples = cursor.fetchall()
 
                 if len(coins_tuples) != self._coin_number:
-                    logging.error("the sqlite error happend")
+                    logging.error("the sqlite error happened")
             finally:
                 connection.commit()
                 connection.close()
@@ -199,10 +199,10 @@ class HistoryManager:
 
     def __fill_part_data(self, start, end, coin, cursor):
         chart = self._coin_list.get_chart_until_success(
-            pair=self._coin_list.allActiveCoins.at[coin, 'pair'],
-            start=start,
-            end=end,
-            period=self.__storage_period)
+            symbol=self._coin_list.allActiveCoins.at[coin, 'pair'],
+            interval=self.__storage_period,
+            startTime=start,
+            endTime=end)
         logging.info("fill %s data from %s to %s" % (coin, datetime.fromtimestamp(start).strftime('%Y-%m-%d %H:%M'),
                                                      datetime.fromtimestamp(end).strftime('%Y-%m-%d %H:%M')))
         for c in chart:

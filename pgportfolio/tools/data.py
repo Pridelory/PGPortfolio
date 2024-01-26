@@ -1,4 +1,7 @@
 from __future__ import division, absolute_import, print_function
+
+import time
+
 import numpy as np
 import pandas as pd
 
@@ -60,8 +63,9 @@ def get_chart_until_success(polo, pair, start, period, end):
     is_connect_success = False
     chart = {}
     while not is_connect_success:
+        # time.sleep(0.5)
         try:
-            chart = polo.marketChart(pair=pair, start=int(start), period=int(period), end=int(end))
+            chart = polo.marketChart(symbol=pair, interval=period, startTime=int(start), endTime=int(end))
             is_connect_success = True
         except Exception as e:
             print(e)
