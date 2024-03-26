@@ -47,24 +47,6 @@ class CoinList(object):
         self._df = pd.DataFrame({'coin': coins, 'pair': pairs, 'volume': volumes, 'price': prices})
         self._df = self._df.set_index('coin')
 
-        # for k, v in vol.items():
-        #     if k.startswith("BTC_") or k.endswith("_BTC"):
-        #         pairs.append(k)
-        #         for c, val in v.items():
-        #             if c != 'BTC':
-        #                 if k.endswith('_BTC'):
-        #                     # BTC is the base
-        #                     coins.append('reversed_' + c)
-        #                     prices.append(1.0 / float(ticker[k]['last']))
-        #                 else:
-        #                     coins.append(c)
-        #                     prices.append(float(ticker[k]['last']))
-        #             else:
-        #                 volumes.append(self.__get_total_volume(pair=k, global_end=end,
-        #                                                        days=volume_average_days,
-        #                                                        forward=volume_forward))
-
-
     @property
     def allActiveCoins(self):
         return self._df

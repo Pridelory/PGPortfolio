@@ -40,7 +40,7 @@ class PoloniexNew:
         # PUBLIC COMMANDS
         self.marketTicker24h = lambda x=0: self.api('ticker24h')
         self.marketChart = lambda symbol, interval=DAY_1, startTime=int(round(time.time() * 1000)) - (week * 1), endTime=int(round(time.time() * 1000)): self.api(
-            symbol + '/candles', {'interval': interval, 'startTime': startTime, 'endTime': endTime})
+            symbol + '/candles', {'interval': interval, 'startTime': startTime, 'endTime': endTime, 'limit': 500})
 
     #####################
     # Main Api Function #

@@ -17,11 +17,11 @@ class HistoryManager:
     # NOTE: return of the sqlite results is a list of tuples, each tuple is a row
     def __init__(self, coin_number, end, volume_average_days=1, volume_forward=0, online=True):
         self.initialize_db()
-        self.__storage_period = MINUTE_5  # keep this as 300
+        self.__storage_period = MINUTE_5  # keep th is as300
         self._coin_number = coin_number
         self._online = online
         if self._online:
-            self._coin_list = CoinList(end, volume_average_days, volume_forward)
+            self._coin_list = CoinList(end, volume_average_days, volume_forw+ard)
         self.__volume_forward = volume_forward
         self.__volume_average_days = volume_average_days
         self.__coins = None
@@ -189,7 +189,7 @@ class HistoryManager:
             connection.close()
 
     def __fill_data(self, start, end, coin, cursor):
-        duration = 7819200  # three months
+        duration = 86400  # 1 day
         bk_start = start
         for bk_end in range(start + duration - 1, end, duration):
             self.__fill_part_data(bk_start, bk_end, coin, cursor)
@@ -199,27 +199,36 @@ class HistoryManager:
 
     def __fill_part_data(self, start, end, coin, cursor):
         chart = self._coin_list.get_chart_until_success(
-            symbol=self._coin_list.allActiveCoins.at[coin, 'pair'],
-            interval=self.__storage_period,
-            startTime=start,
-            endTime=end)
+            pair=self._coin_list.allActiveCoins.at[coin, 'pair'],
+            period=self.__storage_period,
+            start=start,
+            end=end)
         logging.info("fill %s data from %s to %s" % (coin, datetime.fromtimestamp(start).strftime('%Y-%m-%d %H:%M'),
                                                      datetime.fromtimestamp(end).strftime('%Y-%m-%d %H:%M')))
         for c in chart:
-            if c["date"] > 0:
-                if c['weightedAverage'] == 0:
-                    weightedAverage = c['close']
+            low = float(c[0])
+            high = float(c[1])
+            open = float(c[2])
+            close = float(c[3])
+            amount = float(c[4])
+            quantity = float(c[5])
+            weightedAverage = float(c[10])
+            startTime = c[12]
+
+            if startTime > 0:  # start time of interval
+                if weightedAverage == 0:
+                    weightedAverage = close
                 else:
-                    weightedAverage = c['weightedAverage']
+                    weightedAverage = weightedAverage
 
                 # NOTE here the USDT is in reversed order
                 if 'reversed_' in coin:
                     cursor.execute('INSERT INTO History VALUES (?,?,?,?,?,?,?,?,?)',
-                                   (c['date'], coin, 1.0 / c['low'], 1.0 / c['high'], 1.0 / c['open'],
-                                    1.0 / c['close'], c['quoteVolume'], c['volume'],
+                                   (startTime, coin, 1.0 / low, 1.0 / high, 1.0 / open,
+                                    1.0 / close, amount, quantity,
                                     1.0 / weightedAverage))
                 else:
                     cursor.execute('INSERT INTO History VALUES (?,?,?,?,?,?,?,?,?)',
-                                   (c['date'], coin, c['high'], c['low'], c['open'],
-                                    c['close'], c['volume'], c['quoteVolume'],
+                                   (startTime, coin, high, low, open,
+                                    close, quantity, amount,
                                     weightedAverage))
