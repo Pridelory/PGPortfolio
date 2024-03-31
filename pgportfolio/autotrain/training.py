@@ -37,7 +37,7 @@ def train_all(processes=1, device="cpu"):
     train all the agents in the train_package folders
 
     :param processes: the number of the processes. If equal to 1, the logging level is debug
-                      at file and info at console. If greater than 1, the logging level is
+                       inat file andfo at console. If greater than 1, the logging level is
                       info at file and warming at console.
     """
     if processes == 1:

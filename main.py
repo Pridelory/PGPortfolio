@@ -23,7 +23,7 @@ def build_parser():
                         help="number of processes you want to start to train the network",
                         default="1")
     parser.add_argument("--repeat", dest="repeat",
-                        help="repeat times of generating training subfolder",
+                            help="repeat times of generating training subfolder",
                         default="1")
     parser.add_argument("--algo",
                         help="algo name or indexes of training_package ",
@@ -72,7 +72,7 @@ def main():
                      end=end,
                      feature_number=config["input"]["feature_number"],
                      window_size=config["input"]["window_size"],
-                     online=True,
+                     online=config["input"]["online"],
                      period=config["input"]["global_period"],
                      volume_average_days=config["input"]["volume_average_days"],
                      coin_filter=config["input"]["coin_number"],

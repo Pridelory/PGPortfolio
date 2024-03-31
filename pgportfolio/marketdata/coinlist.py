@@ -28,7 +28,7 @@ class CoinList(object):
         for entry in ticker24h:
             symbol = entry['symbol']
             if symbol.startswith("BTC_") or symbol.endswith("_BTC"):
-                if 'TUSD' in symbol or 'USDD' in symbol or 'USDC' in symbol:
+                if 'TUSD' in symbol or 'USDD' in symbol or 'USDC' in symbol or 'ADA' in symbol or 'TRU' in symbol:
                     continue
                 pairs.append(symbol)
                 if symbol.endswith('_BTC'):
@@ -58,6 +58,7 @@ class CoinList(object):
     def get_chart_until_success(self, pair, start, period, end):
         start = start * 1000
         end = end * 1000
+        period = MINUTE_5
         return get_chart_until_success(self._polo, pair, start, period, end)
 
     # get several days volume

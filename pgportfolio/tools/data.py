@@ -67,7 +67,7 @@ def get_chart_until_success(polo, pair, start, period, end):
         try:
             chart = polo.marketChart(symbol=pair, interval=period, startTime=int(start), endTime=int(end))
             is_connect_success = True
-        except Exception as e:
+        except Exception  as e:
             print(e)
     return chart
 

@@ -17,11 +17,11 @@ class HistoryManager:
     # NOTE: return of the sqlite results is a list of tuples, each tuple is a row
     def __init__(self, coin_number, end, volume_average_days=1, volume_forward=0, online=True):
         self.initialize_db()
-        self.__storage_period = MINUTE_5  # keep th is as300
-        self._coin_number = coin_number
+        self.__storage_period = FIVE_MINUTES  # keep this as 300
+        self._coin_number  = coin_number
         self._online = online
         if self._online:
-            self._coin_list = CoinList(end, volume_average_days, volume_forw+ard)
+            self._coin_list = CoinList(end, volume_average_days, volume_forward)
         self.__volume_forward = volume_forward
         self.__volume_average_days = volume_average_days
         self.__coins = None
@@ -48,7 +48,7 @@ class HistoryManager:
 
     def get_global_panel(self, start, end, period=300, features=('close',)):
         """
-        :param start/end: linux timestamp in seconds
+        :param start/end: linux timestamp i n seconds
         :param period: time interval of each data access point
         :param features: tuple or list of the feature names
         :return a panel, [feature, coin, time]
@@ -59,6 +59,7 @@ class HistoryManager:
                                   end=end - self.__volume_forward)
         self.__coins = coins
         for coin in coins:
+            print(coin)
             self.update_data(start, end, coin)
 
         if len(coins) != self._coin_number:
@@ -214,6 +215,7 @@ class HistoryManager:
             quantity = float(c[5])
             weightedAverage = float(c[10])
             startTime = c[12]
+            startTime = int(startTime / 1000)
 
             if startTime > 0:  # start time of interval
                 if weightedAverage == 0:
